@@ -3,6 +3,7 @@
     三，集成redis
     四，集成csrfprotect
     五，集成flask-session
+    六，集成flask-script
     """
 
 from flask import Flask, session
@@ -10,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from redis import StrictRedis
 from flask_wtf import CSRFProtect
 from flask_session import Session
+from flask_script import Manager
 
 
 class Config(object):
@@ -50,6 +52,8 @@ CSRFProtect(app)
 # 集成flask-session
 # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径
 Session(app)
+#集成flask-script
+manager=Manager(app)
 
 
 @app.route('/')
@@ -62,4 +66,4 @@ def index():
 
 if __name__ == '__main__':
     # 运行当前Flask应用程序
-    app.run(debug=True)
+    manager.run()
