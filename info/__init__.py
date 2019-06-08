@@ -5,16 +5,16 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
 from redis import StrictRedis
 
-from config import DevelopConfig
+from config import config
 
 app = Flask(__name__)
 
 # 集成配置类
-app.config.from_object(DevelopConfig)
+app.config.from_object(config["develop"])
 # 集成Sqlalchemy到flask
 db = SQLAlchemy(app)
 # 连接redis
-redis_store = StrictRedis(host=DevelopConfig.REDIS_HOST, port=DevelopConfig.REDIS_PORT)
+redis_store = StrictRedis(host=config["develop"].REDIS_HOST, port=config["develop"].REDIS_PORT)
 
 # CSRFPROTECT保护
 CSRFProtect(app)

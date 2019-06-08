@@ -41,3 +41,10 @@ class TestingConfig(Config):
     """测试环境"""
     pass
 
+
+# 使用字典封装
+config = {
+    "develop": DevelopConfig,
+    "product": ProductConfig,
+    "testing": TestingConfig
+}
