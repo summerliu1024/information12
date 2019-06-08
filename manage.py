@@ -1,11 +1,13 @@
 """一，集成配置类
     二，sqlalchemy
     三，集成redis
+    四，集成csrfprotect
     """
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from redis import StrictRedis
+from flask_wtf import CSRFProtect
 
 
 class Config(object):
@@ -28,6 +30,9 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 # 连接redis
 redis_store = StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT)
+
+# CSRFPROTECT保护
+CSRFProtect(app)
 
 
 @app.route('/')
