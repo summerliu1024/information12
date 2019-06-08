@@ -5,7 +5,7 @@
     五，集成flask-session
     """
 
-from flask import Flask
+from flask import Flask, session
 from flask_sqlalchemy import SQLAlchemy
 from redis import StrictRedis
 from flask_wtf import CSRFProtect
@@ -13,6 +13,7 @@ from flask_session import Session
 
 
 class Config(object):
+    SECRET_KEY='djfdshlfkhsdakfhasdklfhkpas;d'
     # 调试模式
     DEBUG = True
     # 数据库连接
@@ -53,7 +54,9 @@ Session(app)
 
 @app.route('/')
 def index():
-    redis_store.set("name", "summer")
+    # redis_store.set("name", "summer")
+    # 设置一个session 如果在redis中看到了session 说明配置成功
+    session["name"] = "itcast"
     return 'index'
 
 
