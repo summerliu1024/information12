@@ -9,7 +9,10 @@
 
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from info import app, db
+from info import create_app
+
+# 工厂模式创建app
+app, db = create_app("develop")
 
 # 集成flask-script
 manager = Manager(app)
