@@ -12,10 +12,11 @@ from redis import StrictRedis
 from flask_wtf import CSRFProtect
 from flask_session import Session
 from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 
 
 class Config(object):
-    SECRET_KEY='djfdshlfkhsdakfhasdklfhkpas;d'
+    SECRET_KEY = 'djfdshlfkhsdakfhasdklfhkpas;d'
     # 调试模式
     DEBUG = True
     # 数据库连接
@@ -52,8 +53,12 @@ CSRFProtect(app)
 # 集成flask-session
 # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径
 Session(app)
-#集成flask-script
-manager=Manager(app)
+# 集成flask-script
+manager = Manager(app)
+
+# 集成flask-migrate 对数据库进行迁移
+Migrate(app, db)
+manager.add_command("db", MigrateCommand)
 
 
 @app.route('/')
