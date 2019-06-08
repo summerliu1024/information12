@@ -1,8 +1,9 @@
 from redis import StrictRedis
+
+
 class Config(object):
     SECRET_KEY = 'djfdshlfkhsdakfhasdklfhkpas;d'
-    # 调试模式
-    DEBUG = True
+
     # 数据库连接
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1/information12'
     # 数据库跟踪
@@ -20,3 +21,23 @@ class Config(object):
     SESSION_PERMANENT = False
     # 设置session的保存时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
+
+
+# 生产环境，开发环境，测试环境
+
+class DevelopConfig(Config):
+    """开发环境"""
+    # 调试模式
+    DEBUG = True
+
+
+class ProductConfig(Config):
+    """生产环境"""
+    # 调试模式
+    DEBUG = False
+
+
+class TestingConfig(Config):
+    """测试环境"""
+    pass
+
