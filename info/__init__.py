@@ -11,6 +11,8 @@ from redis import StrictRedis
 from config import config
 
 # 集成Sqlalchemy到flask
+from info.modules.index import index_blu
+
 db = SQLAlchemy()
 
 
@@ -43,5 +45,6 @@ def create_app(config_name):
     # 集成flask-session
     # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径
     Session(app)
+    app.register_blueprint(index_blu)
 
     return app

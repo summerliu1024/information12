@@ -21,12 +21,6 @@ manager = Manager(app)
 Migrate(app, db)
 manager.add_command("db", MigrateCommand)
 
-
-@app.route('/')
-def index():
-    return 'index'
-
-
 if __name__ == '__main__':
     # 运行当前Flask应用程序
     manager.run()
