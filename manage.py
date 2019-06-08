@@ -4,6 +4,7 @@
     四，集成csrfprotect
     五，集成flask-session
     六，集成flask-script
+    七，集成flask-migrate
     """
 
 from flask import Flask, session
