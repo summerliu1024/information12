@@ -11,6 +11,8 @@ from redis import StrictRedis
 from config import config
 
 # 集成Sqlalchemy到flask
+
+
 db = SQLAlchemy()
 
 
@@ -50,5 +52,7 @@ def create_app(config_name):
     # 只使用一次，什么时候使用什么时候导入
     from info.modules.index import index_blu
     app.register_blueprint(index_blu)
+    from info.modules.passport import passport_blu
+    app.register_blueprint(passport_blu)
 
     return app
