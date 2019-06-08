@@ -11,8 +11,6 @@ from redis import StrictRedis
 from config import config
 
 # 集成Sqlalchemy到flask
-from info.modules.index import index_blu
-
 db = SQLAlchemy()
 
 
@@ -29,6 +27,9 @@ def set_log(config_name):
     logging.getLogger().addHandler(file_log_handler)
 
 
+redis_store = None  # type:StrictRedis
+
+
 def create_app(config_name):
     set_log(config_name)
     app = Flask(__name__)
@@ -37,6 +38,7 @@ def create_app(config_name):
     # 使用的时候才初始化
     db.init_app(app)
     # 连接redis
+    global redis_store
     redis_store = StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT)
 
     # CSRFPROTECT保护
@@ -45,6 +47,8 @@ def create_app(config_name):
     # 集成flask-session
     # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径
     Session(app)
+    # 只使用一次，什么时候使用什么时候导入
+    from info.modules.index import index_blu
     app.register_blueprint(index_blu)
 
     return app
