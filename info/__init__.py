@@ -41,10 +41,10 @@ def create_app(config_name):
     db.init_app(app)
     # 连接redis
     global redis_store
-    redis_store = StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT)
+    redis_store = StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT,decode_responses=True)
 
     # CSRFPROTECT保护
-    CSRFProtect(app)
+    # CSRFProtect(app)
 
     # 集成flask-session
     # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径

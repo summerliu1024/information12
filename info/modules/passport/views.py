@@ -9,7 +9,6 @@ from info.modules.passport import passport_blu
 from info.utils.captcha.captcha import captcha
 from info.utils.response_code import RET
 
-
 @passport_blu.route('/sms_code', methods=["POST"])
 def send_sms_code():
     """
@@ -23,9 +22,10 @@ def send_sms_code():
     7. 告知发送结果
     :return:
     """
-    '{"mobiel": "18811111111", "image_code": "AAAA", "image_code_id": "u23jksdhjfkjh2jh4jhdsj"}'
+    # '{"mobiel": "18811111111", "image_code": "AAAA", "image_code_id": "u23jksdhjfkjh2jh4jhdsj"}'
     # 1. 获取参数：手机号，图片验证码内容，图片验证码的编号 (随机值)
     # params_dict = json.loads(request.data)
+
     params_dict = request.json
 
     mobile = params_dict.get("mobile")
@@ -60,7 +60,7 @@ def send_sms_code():
     sms_code_str = "%06d" % random.randint(0, 999999)
     current_app.logger.debug("短信验证码内容是：%s" % sms_code_str)
     # 6. 发送短信验证码
-    result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES / 5], "1")
+    result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES / 60], "1")
     if result != 0:
         # 代表发送不成功
         return jsonify(errno=RET.THIRDERR, errmsg="发送短信失败")

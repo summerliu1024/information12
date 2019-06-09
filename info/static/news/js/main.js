@@ -32,21 +32,30 @@ $(function () {
     });
 
 
-    // 点击输入框，提示文字上移
-    $('.form_group').on('click focusin', function () {
-        $(this).children('.input_tip').animate({
-            'top': -5,
-            'font-size': 12
-        }, 'fast').siblings('input').focus().parent().addClass('hotline');
+    // // 点击输入框，提示文字上移
+    // $('.form_group').on('click focusin', function () {
+    //     $(this).children('.input_tip').animate({
+    //         'top': -5,
+    //         'font-size': 12
+    //     }, 'fast').siblings('input').focus().parent().addClass('hotline');
+    // })
+    //
+    // // 输入框失去焦点，如果输入框为空，则提示文字下移
+    // $('.form_group input').on('blur focusout', function () {
+    //     $(this).parent().removeClass('hotline');
+    //     var val = $(this).val();
+    //     if (val == '') {
+    //         $(this).siblings('.input_tip').animate({'top': 22, 'font-size': 14}, 'fast');
+    //     }
+    // })
+
+    $('.form_group').on('click', function () {
+        $(this).children('input').focus()
     })
 
-    // 输入框失去焦点，如果输入框为空，则提示文字下移
-    $('.form_group input').on('blur focusout', function () {
-        $(this).parent().removeClass('hotline');
-        var val = $(this).val();
-        if (val == '') {
-            $(this).siblings('.input_tip').animate({'top': 22, 'font-size': 14}, 'fast');
-        }
+    $('.form_group input').on('focusin', function () {
+        $(this).siblings('.input_tip').animate({'top': -5, 'font-size': 12}, 'fast')
+        $(this).parent().addClass('hotline');
     })
 
 
@@ -175,13 +184,62 @@ function sendSMSCode() {
     }
     var imageCode = $("#imagecode").val();
     if (!imageCode) {
-        $("#image-code-err").html("请填写验证码！");
-        $("#image-code-err").show();
+        $("#register-image-code-err").html("请填写验证码！");
+        $("#register-image-code-err").show();
         $(".get_code").attr("onclick", "sendSMSCode();");
         return;
     }
 
-    // TODO 发送短信验证码
+    //准备数据
+    var params = {
+        "mobile": mobile,
+        "image_code": imageCode,
+        "image_code_id": imageCodeId
+    }
+
+    //  发送短信验证码
+    $.ajax({
+        // 请求地址
+        url: "/passport/sms_code",
+        // 请求方式
+        type: "post",
+        // 请求参数
+        data: JSON.stringify(params),
+        // 请求参数的数据类型
+        contentType: "application/json",
+        success: function (response) {
+            if (response.errno == "0") {
+                // 代表发送成功
+                var num = 60
+                var t = setInterval(function () {
+
+                    if (num == 1) {
+                        // 代表倒计时结束
+                        // 清除倒计时
+                        clearInterval(t)
+
+                        // 设置显示内容
+                        $(".get_code").html("点击获取验证码")
+                        // 添加点击事件
+                        $(".get_code").attr("onclick", "sendSMSCode();");
+                    } else {
+                        num -= 1
+                        // 设置 a 标签显示的内容
+                        $(".get_code").html(num + "秒")
+                    }
+                }, 1000)
+            } else {
+                // 代表发送失败
+                alert(response.errmsg)
+                $("#register-image-code-err").html(response.errmsg)
+                $("#register-image-code-err").show()
+                $(".get_code").attr("onclick", "sendSMSCode();");
+            }
+        }
+
+    })
+
+
 }
 
 // 调用该函数模拟点击左侧按钮
