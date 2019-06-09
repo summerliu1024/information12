@@ -6,6 +6,7 @@ from flask import Flask
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from flask_wtf.csrf import generate_csrf
 from redis import StrictRedis
 
 from config import config
@@ -41,10 +42,19 @@ def create_app(config_name):
     db.init_app(app)
     # 连接redis
     global redis_store
-    redis_store = StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT,decode_responses=True)
+    redis_store = StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT,
+                              decode_responses=True)
 
     # CSRFPROTECT保护
-    # CSRFProtect(app)
+    CSRFProtect(app)
+
+    @app.after_request
+    def after_request(response):
+        # 调用函数生成 csrf_token
+        csrf_token = generate_csrf()
+        # 通过 cookie 将值传给前端
+        response.set_cookie("csrf_token", csrf_token)
+        return response
 
     # 集成flask-session
     # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径
