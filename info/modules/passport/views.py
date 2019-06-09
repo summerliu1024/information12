@@ -58,10 +58,11 @@ def register():
     user.mobile = mobile
     # 暂时没有昵称 ，使用手机号代替
     user.nick_name = mobile
-    user.password_hash = generate_password_hash(password)
+    # user.password_hash = generate_password_hash(password)
+    user.password = password
     # 记录用户最后一次登录时间
     user.last_login = datetime.now()
-    # TODO 对密码做处理
+
 
     # 6. 添加到数据库
     try:
