@@ -12,7 +12,7 @@ from redis import StrictRedis
 from config import config
 
 # 集成Sqlalchemy到flask
-
+from info.utils.common import do_index_class
 
 db = SQLAlchemy()
 
@@ -59,6 +59,10 @@ def create_app(config_name):
     # 集成flask-session
     # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径
     Session(app)
+
+
+    # 添加自定义过滤器
+    app.add_template_filter(do_index_class, "index_class")
     # 只使用一次，什么时候使用什么时候导入
     from info.modules.index import index_blu
     app.register_blueprint(index_blu)
