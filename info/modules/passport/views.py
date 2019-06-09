@@ -1,4 +1,3 @@
-
 import random
 import re
 from datetime import datetime
@@ -11,6 +10,7 @@ from info.models import User
 from info.modules.passport import passport_blu
 from info.utils.captcha.captcha import captcha
 from info.utils.response_code import RET
+
 
 @passport_blu.route('/register', methods=["POST"])
 def register():
@@ -57,6 +57,7 @@ def register():
     user.mobile = mobile
     # 暂时没有昵称 ，使用手机号代替
     user.nick_name = mobile
+    user.password_hash = password
     # 记录用户最后一次登录时间
     user.last_login = datetime.now()
     # TODO 对密码做处理
@@ -77,6 +78,7 @@ def register():
 
     # 7. 返回响应
     return jsonify(errno=RET.OK, errmsg="注册成功")
+
 
 @passport_blu.route('/sms_code', methods=["POST"])
 def send_sms_code():
