@@ -49,7 +49,7 @@ def login():
         return jsonify(errno=RET.NODATA, errmsg="用户不存在")
 
     # 校验登录的密码和当前用户的密码是否一致
-    if not user.check_password(passport):
+    if not user.check_passowrd(passport):
         return jsonify(errno=RET.PWDERR, errmsg="用户名或者密码错误")
 
     # 4. 保存用户的登录状态

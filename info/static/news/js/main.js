@@ -103,24 +103,44 @@ $(function () {
         $(this).addClass('active').siblings().removeClass('active');
         $(this).find('a')[0].click()
     })
-
-    // TODO 登录表单提交
+// 登录表单提交
     $(".login_form_con").submit(function (e) {
         e.preventDefault()
         var mobile = $(".login_form #mobile").val()
-        var password = $(".login_form #password").val()
+        var passport = $(".login_form #password").val()
 
         if (!mobile) {
             $("#login-mobile-err").show();
             return;
         }
 
-        if (!password) {
+        if (!passport) {
             $("#login-password-err").show();
             return;
         }
 
         // 发起登录请求
+        var params = {
+            "mobile": mobile,
+            "passport": passport
+        }
+
+        $.ajax({
+            url: "/passport/login",
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify(params),
+            success: function (resp) {
+                if (resp.errno == "0") {
+                    // 代表登录成功
+                    location.reload()
+                } else {
+                    alert(resp.errmsg)
+                    $("#login-password-err").html(resp.errmsg)
+                    $("#login-password-err").show()
+                }
+            }
+        })
     })
 
 
