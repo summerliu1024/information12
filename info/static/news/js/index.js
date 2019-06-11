@@ -45,18 +45,18 @@ $(function () {
             // TODO 判断页数，去更新新闻数据
 
             if (!data_querying) {
-            // 将`是否正在向后端查询新闻数据`的标志设置为真
-            data_querying = true;
-            // 如果当前页面数还没到达总页数
-            if(cur_page < total_page) {
-                // 向后端发送请求，查询下一页新闻数据
-                cur_page+=1
-                updateNewsData();
+                // 将`是否正在向后端查询新闻数据`的标志设置为真
+                data_querying = true;
+                // 如果当前页面数还没到达总页数
+                if (cur_page < total_page) {
+                    // 向后端发送请求，查询下一页新闻数据
+                    cur_page += 1
+                    updateNewsData();
 
-            } else {
-                data_querying = false;
+                } else {
+                    data_querying = false;
+                }
             }
-        }
         }
     })
 })
@@ -85,9 +85,9 @@ function updateNewsData() {
             for (var i = 0; i < resp.data.news_dict_li.length; i++) {
                 var news = resp.data.news_dict_li[i]
                 var content = '<li>'
-                content += '<a href="#" class="news_pic fl"><img src="' + news.index_image_url + '?imageView2/1/w/170/h/170"></a>'
-                content += '<a href="#" class="news_title fl">' + news.title + '</a>'
-                content += '<a href="#" class="news_detail fl">' + news.digest + '</a>'
+                content += '<a href="/news/' + news.id + '" class="news_pic fl"><img src="' + news.index_image_url + '?imageView2/1/w/170/h/170"></a>'
+                content += '<a href="/news/' + news.id + '" class="news_title fl">' + news.title + '</a>'
+                content += '<a href="/news/' + news.id + '" class="news_detail fl">' + news.digest + '</a>'
                 content += '<div class="author_info fl">'
                 content += '<div class="source fl">来源：' + news.source + '</div>'
                 content += '<div class="time fl">' + news.create_time + '</div>'
