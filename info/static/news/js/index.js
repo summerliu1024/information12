@@ -43,6 +43,20 @@ $(function () {
 
         if ((canScrollHeight - nowScroll) < 100) {
             // TODO 判断页数，去更新新闻数据
+
+            if (!data_querying) {
+            // 将`是否正在向后端查询新闻数据`的标志设置为真
+            data_querying = true;
+            // 如果当前页面数还没到达总页数
+            if(cur_page < total_page) {
+                // 向后端发送请求，查询下一页新闻数据
+                cur_page+=1
+                updateNewsData();
+
+            } else {
+                data_querying = false;
+            }
+        }
         }
     })
 })

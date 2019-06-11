@@ -153,7 +153,7 @@ def register():
     return jsonify(errno=RET.OK, errmsg="注册成功")
 
 
-@passport_blu.route('/sms_code', methods=["POST"])
+@passport_blu.route('/sms_code', methods=["POST","GET"])
 def send_sms_code():
     """
     发送短信的逻辑
@@ -204,10 +204,10 @@ def send_sms_code():
     sms_code_str = "%06d" % random.randint(0, 999999)
     current_app.logger.debug("短信验证码内容是：%s" % sms_code_str)
     # 6. 发送短信验证码
-    result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES / 60], "1")
-    if result != 0:
-        # 代表发送不成功
-        return jsonify(errno=RET.THIRDERR, errmsg="发送短信失败")
+    # result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES / 60], "1")
+    # if result != 0:
+    #     # 代表发送不成功
+    #     return jsonify(errno=RET.THIRDERR, errmsg="发送短信失败")
 
     # 保存验证码内容到redis
     try:

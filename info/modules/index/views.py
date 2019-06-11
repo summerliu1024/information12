@@ -6,7 +6,7 @@ from info.modules.index import index_blu
 from info.utils.response_code import RET
 
 
-@index_blu.route('/news_list')
+@index_blu.route('/news_list',methods=["GET"])
 def news_list():
     """
     获取首页新闻数据
