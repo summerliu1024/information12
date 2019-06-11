@@ -1,20 +1,15 @@
-from flask import render_template, session, current_app
+from flask import render_template, session, current_app, g
 
 from info.models import User
 from info.modules.news import news_blu
+from info.utils.common import user_login_data
 
 
 @news_blu.route('/<int:news_id>')
+@user_login_data
 def news_detail(news_id):
     # 查询用户登录信息
-    user_id = session.get("user_id", None)
-    user = None
-    if user_id:
-        # 尝试查询用户的模型
-        try:
-            user = User.query.get(user_id)
-        except Exception as e:
-            current_app.logger.error(e)
+    user=g.user
     data = {
         "user": user.to_dict() if user else None,
     }

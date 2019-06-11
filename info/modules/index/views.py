@@ -1,8 +1,9 @@
-from flask import render_template, redirect, current_app, session, request, jsonify
+from flask import render_template, redirect, current_app, session, request, jsonify, g
 
 from info import redis_store, constants
 from info.models import User, News, Category
 from info.modules.index import index_blu
+from info.utils.common import user_login_data
 from info.utils.response_code import RET
 
 
@@ -60,6 +61,7 @@ def news_list():
 
 
 @index_blu.route('/')
+@user_login_data
 def index():
     """
     显示首页
@@ -67,15 +69,7 @@ def index():
     :return:
     """
 
-    # 取到用户id
-    user_id = session.get("user_id", None)
-    user = None
-    if user_id:
-        # 尝试查询用户的模型
-        try:
-            user = User.query.get(user_id)
-        except Exception as e:
-            current_app.logger.error(e)
+    user=g.user
 
         # 右侧的新闻排行的逻辑
     news_list = []
