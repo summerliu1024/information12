@@ -23,6 +23,7 @@ class Config(object):
     SESSION_PERMANENT = False
     # 设置session的保存时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
+    SQLALCHEMY_COMMIT_ON_TEARDOWN=True
 
 
 # 生产环境，开发环境，测试环境
