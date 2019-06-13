@@ -102,6 +102,7 @@ def news_detail(news_id):
     if not news:
         # 报404错误，404错误统一显示页面后续再处理
         abort(404)
+        # 是否是收藏　
     is_collected = False
 
     # if 用户已登录：
@@ -113,14 +114,26 @@ def news_detail(news_id):
         # collection_news 后面可以不用加all，因为sqlalchemy会在使用的时候去自动加载
         if news in user.collection_news:
             is_collected = True
-    # 更新新闻的点击次数
-    news.clicks += 1
+
+    # 去查询评论数据
+    comments = []
+    try:
+        comments = Comment.query.filter(Comment.news_id == news_id).order_by(Comment.create_time.desc()).all()
+    except Exception as e:
+        current_app.logger.error(e)
+
+    comment_dict_li = []
+
+    for comment in comments:
+        comment_dict = comment.to_dict()
+        comment_dict_li.append(comment_dict)
 
     data = {
         "user": user.to_dict() if user else None,
         "news_dict_li": news_dict_li,
         "news": news.to_dict(),
-        "is_collected": is_collected
+        "is_collected": is_collected,
+        "comments": comment_dict_li
     }
     return render_template('news/detail.html', data=data)
 
