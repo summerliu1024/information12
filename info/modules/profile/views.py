@@ -6,6 +6,13 @@ from info.utils.common import user_login_data
 from info.utils.response_code import RET
 
 
+
+@profile_blu.route('/pic_info', methods=["GET", "POST"])
+@user_login_data
+def pic_info():
+    user = g.user
+    return render_template('news/user_pic_info.html', data={"user": user.to_dict()})
+
 @profile_blu.route('/base_info', methods=["GET", "POST"])
 @user_login_data
 def base_info():
