@@ -1,17 +1,39 @@
-from flask import render_template, g, request, jsonify
+from flask import render_template, g, request, jsonify, current_app
 from werkzeug.utils import redirect
 
+from info.libs.image_storage import storage
 from info.modules.profile import profile_blu
 from info.utils.common import user_login_data
 from info.utils.response_code import RET
-
 
 
 @profile_blu.route('/pic_info', methods=["GET", "POST"])
 @user_login_data
 def pic_info():
     user = g.user
-    return render_template('news/user_pic_info.html', data={"user": user.to_dict()})
+    if request.method == "GET":
+        return render_template('news/user_pic_info.html', data={"user": user.to_dict()})
+
+    # 如果是POST表示修改头像
+    # 1. 取到上传的图片
+    try:
+        avatar = request.files.get("avatar").read()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
+
+    # 2. 上传头像
+    try:
+        # 使用自已封装的storage方法去进行图片上传
+        key = storage(avatar)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.THIRDERR, errmsg="上传头像失败")
+
+    # 3. 保存头像地址
+    user.avatar_url = key
+    return jsonify(errno=RET.OK, errmsg="OK", data={"avatar_url": constants.QINIU_DOMIN_PREFIX + key})
+
 
 @profile_blu.route('/base_info', methods=["GET", "POST"])
 @user_login_data
