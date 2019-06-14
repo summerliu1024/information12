@@ -11,7 +11,26 @@ from info.utils.response_code import RET
 @profile_blu.route('/pass_info', methods=["GET", "POST"])
 @user_login_data
 def pass_info():
-    return render_template('news/user_pass_info.html')
+    if request.method == "GET":
+        return render_template('news/user_pass_info.html')
+
+    # 1. 获取参数
+    old_password = request.json.get("old_password")
+    news_password = request.json.get("new_password")
+
+    # 2. 校验参数
+    if not all([old_password, news_password]):
+        return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
+
+    # 3. 判断旧密码是否正确
+    user = g.user
+    if not user.check_passowrd(old_password):
+        return jsonify(errno=RET.PWDERR, errmsg="原密码错误")
+
+    # 4. 设置新密码
+    user.password = news_password
+
+    return jsonify(errno=RET.OK, errmsg="保存成功")
 
 
 @profile_blu.route('/pic_info', methods=["GET", "POST"])
