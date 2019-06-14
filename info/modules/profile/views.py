@@ -9,6 +9,11 @@ from info.utils.common import user_login_data
 from info.utils.response_code import RET
 
 
+@profile_blu.route('/news_list')
+@user_login_data
+def user_news_list():
+    return render_template('news/user_news_list.html')
+
 @profile_blu.route('/news_release', methods=["POST", "GET"])
 @user_login_data
 def news_release():
