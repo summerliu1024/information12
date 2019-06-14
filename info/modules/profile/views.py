@@ -1,32 +1,89 @@
 from flask import render_template, g, request, jsonify, current_app
 from werkzeug.utils import redirect
 
-from info import constants
+from info import constants, db
 from info.libs.image_storage import storage
-from info.models import Category
+from info.models import Category, News
 from info.modules.profile import profile_blu
 from info.utils.common import user_login_data
 from info.utils.response_code import RET
 
 
-@profile_blu.route('/news_release', methods=["get", "post"])
+@profile_blu.route('/news_release', methods=["POST", "GET"])
 @user_login_data
 def news_release():
-    # 加载新闻分类数据
-    categories = []
+    '''新闻发布'''
+
+    if not g.user:
+        # 未登录重定向到首页
+        return redirect("/")
+    if request.method == "GET":
+
+        # 动态加载新闻分类数据
+        categories = []
+        try:
+            categories = Category.query.all()
+        except Exception as e:
+            current_app.logger.error(e)
+
+        category_dict_li = []
+        for category in categories:
+            category_dict_li.append(category.to_dict())
+        # 移除最新分类
+        category_dict_li.pop(0)
+        return render_template('news/user_news_release.html', data={"categories": category_dict_li})
+
+    # 获取要提交的数据
+    # 标题
+    title = request.form.get('title')
+    # 新闻来源
+    source = "个人发布"
+    # 摘要
+    digest = request.form.get("digest")
+    # 新闻内容
+    content = request.form.get("content")
+    # 索引图片
+    index_image = request.files.get('index_image')
+    # 分类id
+    category_id = request.form.get("category_id")
+
+    # 校验参数
+    if not all([title, digest, content, index_image, category_id]):
+        return jsonify(errno=RET.PARAMERR, errmsg="PARAMERR error!")
     try:
-        categories = Category.query.all()
+        category_id = int(category_id)
+    except Exception as e:
+        return jsonify(errno=RET.PARAMERR, errmsg="PARAMERR error!")
+    # 取到图片，将图片上传到七牛云
+    try:
+        index_image_data = index_image.read()
+        # 上传到七牛云
+        key = storage(index_image_data)
     except Exception as e:
         current_app.logger.error(e)
+        return jsonify(errno=RET.PARAMERR, errmsg="PARAMERR error!")
 
-    category_dict_li = []
-    for category in categories:
-        category_dict_li.append(category.to_dict())
+    # 保存入库
+    news = News()
+    news.title = title
+    news.digest = digest
+    news.source = source
+    news.content = content
+    news.index_image_url = constants.QINIU_DOMIN_PREFIX + key
+    news.category_id = category_id
+    news.user_id = g.user.id
+    # 代表审核状态
+    news.status = 1
 
-    # 移除最新的分类
-    category_dict_li.pop(0)
+    try:
+        db.session.add(news)
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
+        return jsonify(errno=RET.DBERR, errmsg="News data saving failed！")
 
-    return render_template('news/user_news_release.html', data={"categories": category_dict_li})
+    return jsonify(errno=RET.OK, errmsg="OK")
 
 
 @profile_blu.route('/collection')
