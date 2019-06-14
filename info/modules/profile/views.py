@@ -1,6 +1,7 @@
 from flask import render_template, g, request, jsonify, current_app
 from werkzeug.utils import redirect
 
+from info import constants
 from info.libs.image_storage import storage
 from info.modules.profile import profile_blu
 from info.utils.common import user_login_data
