@@ -188,8 +188,15 @@ $(function () {
                             // 代表是点赞
                             $this.addClass('has_comment_up')
                         } else {
-                            like_count = parseInt(like_count) - 1
-                            $this.removeClass('has_comment_up')
+                            if (like_count == 0) {
+                                like_count = 0
+                                $this.removeClass('has_comment_up')
+                            }
+                            else {
+                                like_count = parseInt(like_count) - 1
+                                $this.removeClass('has_comment_up')
+                            }
+
                         }
                         // 更新点赞数据
                         $this.attr('data-likecount', like_count)
