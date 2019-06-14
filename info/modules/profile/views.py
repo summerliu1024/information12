@@ -5,6 +5,16 @@ from info.modules.profile import profile_blu
 from info.utils.common import user_login_data
 
 
+@profile_blu.route('/base_info')
+@user_login_data
+def base_info():
+    """
+    用户基本信息
+    :return:
+    """
+    return render_template('news/user_base_info.html', data={"user": g.user.to_dict()})
+
+
 @profile_blu.route('/info')
 @user_login_data
 def user_info():
