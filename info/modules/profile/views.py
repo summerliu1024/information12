@@ -8,11 +8,45 @@ from info.utils.common import user_login_data
 from info.utils.response_code import RET
 
 
-
 @profile_blu.route('/collection')
 @user_login_data
 def user_collection():
-    return render_template('news/user_collection.html')
+    # 获取参数
+    page = request.args.get("p", 1)
+
+    # 判断参数
+    try:
+        page = int(page)
+    except Exception as e:
+        current_app.logger.error(e)
+        page = 1
+
+    # 查询用户指定页数的收藏的新闻
+    user = g.user
+
+    news_list = []
+    total_page = 1
+    current_page = 1
+    try:
+        paginate = user.collection_news.paginate(page, constants.USER_COLLECTION_MAX_NEWS, False)
+        current_page = paginate.page
+        total_page = paginate.pages
+        news_list = paginate.items
+    except Exception as e:
+        current_app.logger.error(e)
+
+    news_dict_li = []
+    for news in news_list:
+        news_dict_li.append(news.to_basic_dict())
+
+    data = {
+        "total_page": total_page,
+        "current_page": current_page,
+        "collections": news_dict_li
+    }
+
+    return render_template('news/user_collection.html', data=data)
+
 
 @profile_blu.route('/pass_info', methods=["GET", "POST"])
 @user_login_data
