@@ -8,6 +8,12 @@ from info.utils.common import user_login_data
 from info.utils.response_code import RET
 
 
+
+@profile_blu.route('/collection')
+@user_login_data
+def user_collection():
+    return render_template('news/user_collection.html')
+
 @profile_blu.route('/pass_info', methods=["GET", "POST"])
 @user_login_data
 def pass_info():
