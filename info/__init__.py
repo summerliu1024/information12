@@ -2,7 +2,7 @@
 import logging
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask
+from flask import Flask, render_template, g
 from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
@@ -12,7 +12,7 @@ from redis import StrictRedis
 from config import config
 
 # 集成Sqlalchemy到flask
-from info.utils.common import do_index_class
+from info.utils.common import do_index_class, user_login_data
 
 db = SQLAlchemy()
 
@@ -55,6 +55,14 @@ def create_app(config_name):
         # 通过 cookie 将值传给前端
         response.set_cookie("csrf_token", csrf_token)
         return response
+
+    @app.errorhandler(404)
+    @user_login_data
+    def page_not_fount(e):
+        user = g.user
+        data = {"user": user.to_dict() if user else None}
+        return render_template('news/404.html', data=data)
+        return app
 
     # 集成flask-session
     # 说明 flask中的session是保存用户数据的容器（上下文），而flask-session是指定session保存的路径

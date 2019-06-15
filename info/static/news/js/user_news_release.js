@@ -6,9 +6,19 @@ function getCookie(name) {
 
 $(function () {
     $(".release_form").submit(function (e) {
+
         e.preventDefault()
         // 发布新闻
         $(this).ajaxSubmit({
+            beforeSubmit: function (request) {
+                // 在提交之前，对参数进行处理
+                for (var i = 0; i < request.length; i++) {
+                    var item = request[i]
+                    if (item["name"] == "content") {
+                        item["value"] = tinyMCE.activeEditor.getContent()
+                    }
+                }
+            },
             url: "/user/news_release",
             type: "post",
             headers: {
