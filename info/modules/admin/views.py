@@ -3,9 +3,101 @@ from datetime import datetime, timedelta
 
 from flask import render_template, request, current_app, session, redirect, url_for, g
 
-from info import user_login_data
-from info.models import User
+from info import user_login_data, constants
+from info.models import User, News
 from info.modules.admin import admin_blu
+
+
+@admin_blu.route('/news_review_detail/<int:news_id>')
+def news_review_detail(news_id):
+
+    # 通过id查询新闻
+    news = None
+    try:
+        news = News.query.get(news_id)
+    except Exception as e:
+        current_app.logger.error(e)
+
+    if not news:
+        return render_template('admin/news_review_detail.html', data={"errmsg": "未查询到此新闻"})
+
+    # 返回数据
+    data = {"news": news.to_dict()}
+    return render_template('admin/news_review_detail.html', data=data)
+
+@admin_blu.route('/news_review')
+def news_review():
+    page = request.args.get("p", 1)
+    keywords = request.args.get("keywords", None)
+
+    try:
+        page = int(page)
+    except Exception as e:
+        current_app.logger.error(e)
+        page = 1
+
+    news_list = []
+    current_page = 1
+    total_page = 1
+
+    filters = [News.status != 0]
+    # 如果关键字存在，那么就添加关键字搜索
+    if keywords:
+        filters.append(News.title.contains(keywords))
+    try:
+        paginate = News.query.filter(*filters) \
+            .order_by(News.create_time.desc()) \
+            .paginate(page, constants.ADMIN_NEWS_PAGE_MAX_COUNT, False)
+
+        news_list = paginate.items
+        current_page = paginate.page
+        total_page = paginate.pages
+    except Exception as e:
+        current_app.logger.error(e)
+
+    news_dict_list = []
+    for news in news_list:
+        news_dict_list.append(news.to_review_dict())
+
+    context = {"total_page": total_page, "current_page": current_page, "news_list": news_dict_list}
+
+    return render_template('admin/news_review.html', data=context)
+
+
+@admin_blu.route('/user_list')
+def user_list():
+    page = request.args.get("page", 1)
+
+    try:
+        page = int(page)
+    except Exception as e:
+        current_app.logger.error(e)
+        page = 1
+
+    users = []
+    current_page = 1
+    total_page = 1
+
+    try:
+        paginate = User.query.filter(User.is_admin == False).paginate(page, constants.ADMIN_USER_PAGE_MAX_COUNT, False)
+        users = paginate.items
+        current_page = paginate.page
+        total_page = paginate.pages
+    except Exception as e:
+        current_app.logger.error(e)
+
+    # 进行模型列表转字典列表
+    user_dict_li = []
+    for user in users:
+        user_dict_li.append(user.to_admin_dict())
+
+    data = {
+        "users": user_dict_li,
+        "total_page": total_page,
+        "current_page": current_page,
+    }
+
+    return render_template('admin/user_list.html', data=data)
 
 
 @admin_blu.route('/user_count')
