@@ -23,6 +23,8 @@ def logout():
     session.pop('user_id', None)
     session.pop('mobile', None)
     session.pop('nick_name', None)
+    # 避免admin和普通用户冲突
+    session.pop('is_admin', None)
 
     return jsonify(errno=RET.OK, errmsg="退出成功")
 
@@ -153,7 +155,7 @@ def register():
     return jsonify(errno=RET.OK, errmsg="注册成功")
 
 
-@passport_blu.route('/sms_code', methods=["POST","GET"])
+@passport_blu.route('/sms_code', methods=["POST", "GET"])
 def send_sms_code():
     """
     发送短信的逻辑
